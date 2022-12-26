@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "message-api",
+  "version": "${version}",
+
+  "name": "message-api",
+  "description": "Message api for translatable, configurable and colorful messages with placeholders",
+  "authors": [
+    "Drex"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.drex.message.impl.MessageMod"
+    ]
+  },
+  "mixins": [
+    "messageapi.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.10",
+    "java": ">=17"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "testmod.reload": "<rainbow>Messages have been reloaded in ${time}ms!",
+  "testmod.whois": "<yellow>---[Whois (</yellow><gold>%player:displayname%</gold><yellow>)]---</yellow>\n<yellow>Ping: %player:ping_colored%ms</yellow>\n<yellow>Health: </yellow><gold>%player:health%</gold><yellow>/</yellow><gold>%player:max_health%</gold>\n<yellow>Playtime:</yellow> <gold>%player:playtime%</gold>\n<yellow>Pos:</yellow> <run_cmd:'/execute in %world:id% run tp @s %player:pos_x% %player:pos_y% %player:pos_z%'><hover:'<aqua>Click to teleport!</aqua>'><gold>%player:pos_x% %player:pos_y% %player:pos_z%</gold> <yellow>in</yellow> <gold>%world:name%</gold></hover></run_cmd>",
+  "testmod.homes.seperator": "<gray>, </gray>",
+  "testmod.homes.element": "<hover:show_text:'<green><italic>Click to teleport!<reset>\n<gold>Pos: <yellow>${home_pos}\n<gold>Dimension: <yellow>${home_dim}'><click:run_command:'/testmod home ${home_name}'><aqua>${home_name}<reset>",
+  "testmod.home.teleport": "<yellow>Teleporting to <gold>${home_name}<yellow>!",
+  "testmod.home.unknown": "<red>Unknown home name!"
+}

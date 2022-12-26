@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.drex.message.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "ComponentSerializerMixin",
+    "ServerGamePacketListenerImplMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

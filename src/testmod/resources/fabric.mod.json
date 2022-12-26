@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "testmod",
+  "version": "1.0.0",
+  "name": "Test Mod",
+  "description": "",
+  "authors": [
+    "Drex"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.drex.messagetest.TestMod"
+    ]
+  }
+}
