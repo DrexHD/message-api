@@ -34,7 +34,7 @@ Add your message to the file (make sure to prefix the message id with your mod i
 ### Creating messages
 Use any of the provided methods in [Message](src/main/java/me/drex/message/api/Message.java) to get your text instance, which works like any other vanilla text instance!
 ```java
-ServerPlayer player;
+ServerPlayerEntity player;
 player.sendMessageToClient(Message.message("modid.some.message.id"));
 ```
 
