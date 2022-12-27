@@ -1,12 +1,12 @@
 [![release](https://jitpack.io/v/DrexHD/message-api.svg)](https://jitpack.io/#DrexHD/message-api)
 # message-api [DRAFT]
 
-A simple server-side message API for Fabric. It allows for translatable messages, with markdown parsing using [PlaceholderAPI](https://placeholders.pb4.eu/)
+A simple server-side message API for Fabric. It allows for translatable messages, with text parsing using [PlaceholderAPI](https://placeholders.pb4.eu/)
 , which can be customized with ease by end users.
 
 ## Features
 
-- Special markdown parsing with PlaceholderAPI
+- Special text parsing with PlaceholderAPI
 - Easy customizable in-game messages
 - Language localization support
 - Easy to integrate
@@ -52,4 +52,4 @@ To change messages, edit the JSON file in `./config/<modid>/<languageid>.json`. 
 
 ## Credits
 
-Special thanks to [PlaceholderAPI](https://placeholders.pb4.eu/) for providing the markdown parsing functionality.
+Special thanks to [PlaceholderAPI](https://placeholders.pb4.eu/) for providing the parsing functionality.

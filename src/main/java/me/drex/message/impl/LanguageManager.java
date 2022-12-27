@@ -3,6 +3,9 @@ package me.drex.message.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.TextParserUtils;
+import eu.pb4.placeholders.api.node.TextNode;
 import me.drex.message.impl.interfaces.ClientLanguageGetter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -33,6 +36,7 @@ public class LanguageManager {
     private static final Type LANGUAGEDATA_TYPE = TypeToken.getParameterized(Map.class, String.class, String.class).getType();
 
     private static final Map<String, Map<String, String>> languageData = new HashMap<>();
+    private static final Map<String, Map<String, TextNode>> cachedLanguageData = new HashMap<>();
 
     private LanguageManager() {
     }
@@ -48,25 +52,37 @@ public class LanguageManager {
             }
             languageData.clear();
             languageData.putAll(data);
+            cachedLanguageData.clear();
+            cachedLanguageData.putAll(
+                    languageData.entrySet().stream()
+                            .collect(Collectors.toMap(
+                                    Map.Entry::getKey,
+                                    entry -> entry.getValue().entrySet().stream().collect(
+                                            Collectors.toMap(
+                                                    Map.Entry::getKey,
+                                                    innerEntry -> TextParserUtils.formatNodes(innerEntry.getValue())
+                                            ))
+                            ))
+            );
         } catch (Throwable throwable) {
             LOGGER.error("Failed to load message data, keeping previous data!", throwable);
         }
     }
 
-    public static String resolveMessageId(@Nullable ServerPlayer player, @NotNull String key) {
+    public static TextNode resolveMessageId(@Nullable ServerPlayer player, @NotNull String key) {
         String languageCode;
         if (player != null) {
             // Attempt to load the message using the players chosen language
             languageCode = ((ClientLanguageGetter) player.connection).getLanguage();
-            @Nullable Map<String, String> messages = languageData.get(languageCode);
+            @Nullable Map<String, TextNode> messages = cachedLanguageData.get(languageCode);
             if (messages != null) {
-                String message = messages.get(key);
+                TextNode message = messages.get(key);
                 if (message != null) return message;
             }
         }
         // Attempt to load the message using the default language "en_us"
-        Map<String, String> messages = languageData.getOrDefault(DEFAULT_LANG, Collections.emptyMap());
-        return messages.getOrDefault(key, key);
+        Map<String, TextNode> messages = cachedLanguageData.getOrDefault(DEFAULT_LANG, Collections.emptyMap());
+        return messages.getOrDefault(key, TextParserUtils.formatNodes(key));
     }
 
     private static Map<String, Map<String, String>> loadModLanguages(ModContainer modContainer) {
