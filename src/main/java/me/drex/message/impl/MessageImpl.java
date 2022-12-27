@@ -1,7 +1,7 @@
 package me.drex.message.impl;
 
 import eu.pb4.placeholders.api.*;
-import eu.pb4.placeholders.api.node.parent.ParentTextNode;
+import eu.pb4.placeholders.api.node.TextNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.MinecraftServer;
@@ -32,8 +32,7 @@ public class MessageImpl implements ComponentContents {
     public MutableComponent parseMessage(MinecraftServer server, @Nullable PlaceholderContext dynamicContext) {
         PlaceholderContext context;
         context = Objects.requireNonNullElseGet(this.staticContext, () -> Objects.requireNonNullElseGet(dynamicContext, () -> PlaceholderContext.of(server)));
-        String text = LanguageManager.resolveMessageId(context.player(), this.key);
-        ParentTextNode node = TextParserUtils.formatNodes(text);
+        TextNode node = LanguageManager.resolveMessageId(context.player(), this.key);
         if (this.placeholders != null) {
             node = Placeholders.parseNodes(node, Placeholders.PREDEFINED_PLACEHOLDER_PATTERN, this.placeholders);
         }
