@@ -1,5 +1,5 @@
 [![release](https://jitpack.io/v/DrexHD/message-api.svg)](https://jitpack.io/#DrexHD/message-api)
-# message-api [DRAFT]
+# message-api
 
 A simple server-side message API for Fabric. It allows for translatable messages, with text parsing using [PlaceholderAPI](https://placeholders.pb4.eu/)
 , which can be customized with ease by end users.
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    include(modImplementation("com.github.DrexHD:message-api:0.0.1"))
+    include(modImplementation("com.github.DrexHD:message-api:[TAG]"))
 }
 ```
 
