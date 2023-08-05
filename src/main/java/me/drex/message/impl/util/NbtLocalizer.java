@@ -22,18 +22,41 @@ import java.util.List;
 
 public class NbtLocalizer {
 
+    public static final Style DEFAULT_STYLE = Style.EMPTY
+        .withColor(ChatFormatting.WHITE)
+        .withItalic(false);
     private final CompoundTag compoundTag;
     private final MinecraftServer server;
     private final PlaceholderContext placeholderContext;
     private boolean localized = false;
-    public static final Style DEFAULT_STYLE = Style.EMPTY
-            .withColor(ChatFormatting.WHITE)
-            .withItalic(false);
 
     public NbtLocalizer(CompoundTag original, MinecraftServer server, PlaceholderContext placeholderContext) {
         this.server = server;
         this.placeholderContext = placeholderContext;
         this.compoundTag = original.copy();
+    }
+
+    private static List<String> splitComponents(List<MutableComponent> components) {
+        List<String> result = new ArrayList<>();
+        MutableComponent builder = Component.empty();
+        for (MutableComponent component : components) {
+            if (component.getContents() instanceof LiteralContents literal && literal.text().contains("\n")) {
+                String[] lines = literal.text().split("\\n", -1);
+                for (int i = 0; i < lines.length - 1; i++) {
+                    String line = lines[i];
+                    builder.append(Component.literal(line).withStyle(component.getStyle()));
+                    result.add(Component.Serializer.toJson(builder));
+                    builder = Component.empty();
+                }
+                builder.append(Component.literal(lines[lines.length - 1]).withStyle(component.getStyle()));
+            } else {
+                builder.append(component);
+            }
+        }
+        if (!builder.getSiblings().isEmpty()) {
+            result.add(Component.Serializer.toJson(builder));
+        }
+        return result;
     }
 
     private void localize() {
@@ -110,33 +133,10 @@ public class NbtLocalizer {
     private void collectComponents(List<MutableComponent> components, Component current, Style style) {
         Style updatedStyle = current.getStyle().applyTo(style);
         components.add(MutableComponent.create(current.getContents()).setStyle(
-                updatedStyle));
+            updatedStyle));
         for (Component sibling : current.getSiblings()) {
             collectComponents(components, sibling, updatedStyle);
         }
-    }
-
-    private static List<String> splitComponents(List<MutableComponent> components) {
-        List<String> result = new ArrayList<>();
-        MutableComponent builder = Component.empty();
-        for (MutableComponent component : components) {
-            if (component.getContents() instanceof LiteralContents literal && literal.text().contains("\n")) {
-                String[] lines = literal.text().split("\\n", -1);
-                for (int i = 0; i < lines.length - 1; i++) {
-                    String line = lines[i];
-                    builder.append(Component.literal(line).withStyle(component.getStyle()));
-                    result.add(Component.Serializer.toJson(builder));
-                    builder = Component.empty();
-                }
-                builder.append(Component.literal(lines[lines.length - 1]).withStyle(component.getStyle()));
-            } else {
-                builder.append(component);
-            }
-        }
-        if (!builder.getSiblings().isEmpty()) {
-            result.add(Component.Serializer.toJson(builder));
-        }
-        return result;
     }
 
 

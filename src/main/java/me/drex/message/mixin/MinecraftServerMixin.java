@@ -16,11 +16,11 @@ import java.util.concurrent.CompletableFuture;
 public class MinecraftServerMixin {
 
     @Inject(
-            method = "runServer",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/MinecraftServer;initServer()Z"
-            )
+        method = "runServer",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/MinecraftServer;initServer()Z"
+        )
     )
     private void captureServerInstance(CallbackInfo info) {
         MessageMod.SERVER_INSTANCE = (MinecraftServer) (Object) this;

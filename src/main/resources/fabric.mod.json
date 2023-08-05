@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "message-api",
   "version": "${version}",
-
   "name": "message-api",
   "description": "Message api for translatable, configurable and colorful messages with placeholders",
   "authors": [
@@ -24,7 +23,9 @@
   },
   "custom": {
     "modmenu": {
-      "badges": [ "library" ]
+      "badges": [
+        "library"
+      ]
     }
   }
 }

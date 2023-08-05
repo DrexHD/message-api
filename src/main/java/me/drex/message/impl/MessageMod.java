@@ -10,8 +10,8 @@ public class MessageMod implements ModInitializer {
 
     public static final String MOD_ID = "message-api";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static MinecraftServer SERVER_INSTANCE;
     public static final ThreadLocal<ServerPlayer> PACKET_LISTENER = ThreadLocal.withInitial(() -> null);
+    public static MinecraftServer SERVER_INSTANCE;
 
     @Override
     public void onInitialize() {

@@ -16,11 +16,11 @@ import static me.drex.message.impl.MessageMod.PACKET_LISTENER;
 public abstract class FriendlyByteBufMixin {
 
     @ModifyArg(
-            method = "writeItem",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/network/FriendlyByteBuf;writeNbt(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/network/FriendlyByteBuf;"
-            )
+        method = "writeItem",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/network/FriendlyByteBuf;writeNbt(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/network/FriendlyByteBuf;"
+        )
     )
     private CompoundTag localizeItemStack(CompoundTag compoundTag) {
         if (compoundTag != null) {

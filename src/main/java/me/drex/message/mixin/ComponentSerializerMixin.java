@@ -30,7 +30,8 @@ public abstract class ComponentSerializerMixin {
     @Shadow
     public abstract JsonElement serialize(Component component, Type type, JsonSerializationContext jsonSerializationContext);
 
-    @Shadow public abstract MutableComponent deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException;
+    @Shadow
+    public abstract MutableComponent deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException;
 
     @Inject(
         method = "serialize(Lnet/minecraft/network/chat/Component;Ljava/lang/reflect/Type;Lcom/google/gson/JsonSerializationContext;)Lcom/google/gson/JsonElement;",

@@ -21,12 +21,12 @@ public abstract class PacketEncoderMixin implements ConnectionHolder {
     private Connection message_api$connection;
 
     @Inject(
-            method = "encode(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;Lio/netty/buffer/ByteBuf;)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/network/protocol/Packet;write(Lnet/minecraft/network/FriendlyByteBuf;)V",
-                    shift = At.Shift.BEFORE
-            )
+        method = "encode(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;Lio/netty/buffer/ByteBuf;)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/network/protocol/Packet;write(Lnet/minecraft/network/FriendlyByteBuf;)V",
+            shift = At.Shift.BEFORE
+        )
     )
     private void setPacketListener(ChannelHandlerContext channelHandlerContext, Packet<?> packet, ByteBuf byteBuf, CallbackInfo ci) {
         if (message_api$connection.getPacketListener() instanceof ServerGamePacketListenerImpl listener) {
