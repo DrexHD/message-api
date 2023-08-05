@@ -17,6 +17,8 @@ A simple server-side message API for Fabric. It allows for translatable messages
 
 To use message-api in your mod, add the following to your `build.gradle` file:
 
+Message-api doesn't bundle placeholder-api, you have to bundle a compatible of it as well.
+Replace `[TAG]` with the respective version.
 ```groovy
 repositories {
     maven { url = "https://jitpack.io" }
@@ -24,6 +26,7 @@ repositories {
 
 dependencies {
     include(modImplementation("com.github.DrexHD:message-api:[TAG]"))
+    include(modImplementation("eu.pb4:placeholder-api:[TAG]"))
 }
 ```
 
