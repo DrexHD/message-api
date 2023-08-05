@@ -28,7 +28,7 @@ dependencies {
 ```
 
 ### Adding messages
-Create a messages folder in your resource folder. Create a JSON file with the [language code](https://minecraft.fandom.com/wiki/Language#Languages) you would like to add, like the [testmod example](src/testmod/resources/messages/en_us.json).
+Create a messages folder in your resource folder. Create a JSON file with the [language code](https://minecraft.fandom.com/wiki/Language#Languages) you would like to add, like the [testmod example](src/testMod/resources/messages/en_us.json).
 Add your message to the file (make sure to prefix the message id with your mod id, to avoid conflicts). 
 
 ### Creating messages

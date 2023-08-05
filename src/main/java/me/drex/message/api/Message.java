@@ -1,52 +1,36 @@
 package me.drex.message.api;
 
-import eu.pb4.placeholders.api.*;
-import eu.pb4.placeholders.api.node.parent.ParentTextNode;
-import me.drex.message.impl.LanguageManager;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
 import me.drex.message.impl.MessageImpl;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-public class Message {
+import static eu.pb4.placeholders.api.Placeholders.DEFAULT_PLACEHOLDER_GETTER;
 
-    /**
-     * Copy of Placeholders#PLACEHOLDER_GETTER, because it is unfortunately private
-     */
-    public static final Placeholders.PlaceholderGetter DEFAULT_PLACEHOLDER_GETTER = new Placeholders.PlaceholderGetter() {
-        public PlaceholderHandler getPlaceholder(String placeholder) {
-            return Placeholders.getPlaceholders().get(ResourceLocation.tryParse(placeholder));
-        }
-        public boolean isContextOptional() {
-            return false;
-        }
-    };
+public interface Message {
 
-    public static MutableComponent message(String key) {
-        return new MessageImpl(key, Collections.emptyMap(), Collections.singletonList(DEFAULT_PLACEHOLDER_GETTER), null).toText();
+    static MutableComponent message(String key) {
+        return message(key, Map.of());
     }
 
-    public static MutableComponent message(String key, Map<String, Component> placeholders) {
-        return new MessageImpl(key, placeholders, Collections.singletonList(DEFAULT_PLACEHOLDER_GETTER), null).toText();
+    static MutableComponent message(String key, Map<String, Component> placeholders) {
+        return message(key, placeholders, null);
     }
 
-    public static MutableComponent message(String key, @Nullable PlaceholderContext staticContext) {
-        return new MessageImpl(key, Collections.emptyMap(), Collections.singletonList(DEFAULT_PLACEHOLDER_GETTER), staticContext).toText();
+    static MutableComponent message(String key, @Nullable PlaceholderContext staticContext) {
+        return message(key, Map.of(), List.of(DEFAULT_PLACEHOLDER_GETTER), staticContext);
     }
 
-    public static MutableComponent message(String key, Map<String, Component> placeholders, @Nullable PlaceholderContext context) {
-        return new MessageImpl(key, placeholders, Collections.singletonList(DEFAULT_PLACEHOLDER_GETTER), context).toText();
+    static MutableComponent message(String key, Map<String, Component> placeholders, @Nullable PlaceholderContext context) {
+        return message(key, placeholders, List.of(DEFAULT_PLACEHOLDER_GETTER), context);
     }
 
-    public static MutableComponent message(String key, Map<String, Component> placeholders, List<Placeholders.PlaceholderGetter> getters, @Nullable PlaceholderContext context) {
+    static MutableComponent message(String key, Map<String, Component> placeholders, List<Placeholders.PlaceholderGetter> getters, @Nullable PlaceholderContext context) {
         return new MessageImpl(key, placeholders, getters, context).toText();
     }
 

@@ -3,7 +3,6 @@ package me.drex.message.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
 import eu.pb4.placeholders.api.node.TextNode;
 import me.drex.message.impl.interfaces.ClientLanguageGetter;
@@ -13,12 +12,14 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static me.drex.message.impl.MessageMod.LOGGER;
 
@@ -54,15 +55,15 @@ public class LanguageManager {
             languageData.putAll(data);
             cachedLanguageData.clear();
             cachedLanguageData.putAll(
-                    languageData.entrySet().stream()
-                            .collect(Collectors.toMap(
-                                    Map.Entry::getKey,
-                                    entry -> entry.getValue().entrySet().stream().collect(
-                                            Collectors.toMap(
-                                                    Map.Entry::getKey,
-                                                    innerEntry -> TextParserUtils.formatNodes(innerEntry.getValue())
-                                            ))
+                languageData.entrySet().stream()
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().entrySet().stream().collect(
+                            Collectors.toMap(
+                                Map.Entry::getKey,
+                                innerEntry -> TextParserUtils.formatNodes(innerEntry.getValue())
                             ))
+                    ))
             );
         } catch (Throwable throwable) {
             LOGGER.error("Failed to load message data, keeping previous data!", throwable);
@@ -112,16 +113,20 @@ public class LanguageManager {
     private static Map<String, Map<String, String>> loadModLanguagesFromPath(Path root) {
         try {
             Map<String, Map<String, String>> messages = new HashMap<>();
-            Set<Path> paths = Files.walk(root, 1).filter(p -> !Files.isDirectory(p)).collect(Collectors.toSet());
-            for (Path path : paths) {
-                try {
-                    String languageCode = parseLanguageCode(path.getFileName().toString());
-                    messages.put(languageCode, loadLanguageData(path));
-                } catch (IllegalArgumentException e) {
-                    LOGGER.error("Failed to parse language file name", e);
+            try (
+                Stream<Path> files = Files.walk(root, 1)
+            ) {
+                Set<Path> paths = files.filter(p -> !Files.isDirectory(p)).collect(Collectors.toSet());
+                for (Path path : paths) {
+                    try {
+                        String languageCode = parseLanguageCode(path.getFileName().toString());
+                        messages.put(languageCode, loadLanguageData(path));
+                    } catch (IllegalArgumentException e) {
+                        LOGGER.error("Failed to parse language file name", e);
+                    }
                 }
+                return messages;
             }
-            return messages;
         } catch (IOException e) {
             LOGGER.error("Failed to load language files", e);
             return Collections.emptyMap();

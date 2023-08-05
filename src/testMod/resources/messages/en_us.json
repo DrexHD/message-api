@@ -4,5 +4,9 @@
   "testmod.homes.seperator": "<gray>, </gray>",
   "testmod.homes.element": "<hover:show_text:'<green><italic>Click to teleport!<reset>\n<gold>Pos: <yellow>${home_pos}\n<gold>Dimension: <yellow>${home_dim}'><click:run_command:'/testmod home ${home_name}'><aqua>${home_name}<reset>",
   "testmod.home.teleport": "<yellow>Teleporting to <gold>${home_name}<yellow>!",
-  "testmod.home.unknown": "<red>Unknown home name!"
+  "testmod.home.unknown": "<red>Unknown home name!",
+  "testmod.unstyled": "This message is unstyled, but gets styled in the code",
+  "testmod.item.name": "<yellow>Hello %player:displayname%, you are at %player:pos_x% %player:pos_y% %player:pos_z%",
+  "testmod.item.lore": "Move this item to update it's name and lore\n<rainbow>You can have multiple lines in lores</rainbow>\n<yellow>${variable}",
+  "testmod.item.lore.inner": "This is a message <green>variable</green> used inside the lore"
 }

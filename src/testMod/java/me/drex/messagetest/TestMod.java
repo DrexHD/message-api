@@ -6,18 +6,26 @@ import me.drex.message.api.Message;
 import me.drex.message.impl.LanguageManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static me.drex.message.api.Message.message;
 
 public class TestMod implements ModInitializer {
 
@@ -36,7 +44,7 @@ public class TestMod implements ModInitializer {
                         stopWatch.start();
                         LanguageManager.loadLanguages();
                         stopWatch.stop();
-                        context.getSource().sendSuccess(Message.message("testmod.reload", new HashMap<>() {{
+                        context.getSource().sendSuccess(message("testmod.reload", new HashMap<>() {{
                             put("time", Component.literal(String.valueOf(stopWatch.getTime())));
                         }}), false);
                         return 1;
@@ -46,13 +54,13 @@ public class TestMod implements ModInitializer {
                                     .executes(context -> {
                                         ServerPlayer target = EntityArgument.getPlayer(context, "target");
                                         context.getSource().sendSuccess(
-                                                Message.message("testmod.whois", PlaceholderContext.of(target)), false);
+                                                message("testmod.whois", PlaceholderContext.of(target)), false);
                                         return 1;
                                     })
                     ))
                     .then(Commands.literal("homes").executes(context -> {
                         context.getSource().sendSuccess(
-                                ComponentUtils.formatList(List.of(EXAMPLE_HOMES), Message.message("testmod.homes.seperator"), home -> Message.message("testmod.homes.element", home.placeholders())),
+                                ComponentUtils.formatList(List.of(EXAMPLE_HOMES), message("testmod.homes.seperator"), home -> message("testmod.homes.element", home.placeholders())),
                                 false
                         );
                         return 1;
@@ -63,14 +71,37 @@ public class TestMod implements ModInitializer {
                                         String name = StringArgumentType.getString(context, "name");
                                         for (Home home : EXAMPLE_HOMES) {
                                             if (home.name.equals(name)) {
-                                                context.getSource().sendSuccess(Message.message("testmod.home.teleport", home.placeholders()), false);
+                                                context.getSource().sendSuccess(message("testmod.home.teleport", home.placeholders()), false);
                                                 return 1;
                                             }
                                         }
-                                        context.getSource().sendFailure(Message.message("testmod.home.unknown"));
+                                        context.getSource().sendFailure(message("testmod.home.unknown"));
                                         return 0;
                                     }))
-                    ));
+                    ).then(
+                            Commands.literal("item")
+                                    .executes(context -> {
+                                        ServerPlayer player = context.getSource().getPlayerOrException();
+                                        ItemStack handItem = player.getMainHandItem();
+                                        if (!handItem.isEmpty()) {
+                                            handItem.setHoverName(message("testmod.item.name"));
+                                            ListTag lore = new ListTag();
+                                            lore.add(StringTag.valueOf(Component.Serializer.toJson(
+                                                    message("testmod.item.lore", Map.of("player", player.getDisplayName(), "variable", message("testmod.item.lore.inner")))
+                                            )));
+                                            handItem.getOrCreateTagElement("display").put("Lore", lore);
+                                        }
+                                        return 1;
+                                    })
+                    ).then(
+                            Commands.literal("style")
+                                    .executes(context -> {
+                                        context.getSource().sendSuccess(
+                                            message("testmod.unstyled").withStyle(ChatFormatting.BLUE), false);
+                                        return 1;
+                                    })
+                    )
+            );
         });
     }
 

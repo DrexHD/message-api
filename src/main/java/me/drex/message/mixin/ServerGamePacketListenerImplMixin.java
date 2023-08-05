@@ -16,7 +16,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ClientLanguag
     private String messageApi$language;
 
     @Inject(method = "handleClientInformation", at = @At(value = "TAIL"))
-    public void messageApi$saveClientLanguage(ServerboundClientInformationPacket clientInfoPacket, CallbackInfo ci) {
+    public void saveClientLanguage(ServerboundClientInformationPacket clientInfoPacket, CallbackInfo ci) {
         messageApi$language = clientInfoPacket.language();
     }
 

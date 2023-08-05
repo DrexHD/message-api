@@ -1,6 +1,9 @@
 package me.drex.message.impl;
 
-import eu.pb4.placeholders.api.*;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.pb4.placeholders.api.ParserContext;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.node.TextNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.*;
@@ -44,27 +47,55 @@ public class MessageImpl implements ComponentContents {
 
     @Override
     public <T> @NotNull Optional<T> visit(FormattedText.StyledContentConsumer<T> styledContentConsumer, Style style) {
-        return Optional.empty();
+        try {
+            return resolve(null, null, 0).visit(styledContentConsumer, style);
+        } catch (Throwable e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public <T> @NotNull Optional<T> visit(FormattedText.ContentConsumer<T> contentConsumer) {
-        return Optional.empty();
+        try {
+            return resolve(null, null, 0).visit(contentConsumer);
+        } catch (Throwable e) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public @NotNull MutableComponent resolve(@Nullable CommandSourceStack src, @Nullable Entity entity, int i) {
+    public @NotNull MutableComponent resolve(@Nullable CommandSourceStack src, @Nullable Entity entity, int i) throws CommandSyntaxException {
         PlaceholderContext context = null;
         if (src != null) {
             context = PlaceholderContext.of(src);
         } else {
             if (entity != null) context = PlaceholderContext.of(entity);
         }
-        return parseMessage(MessageMod.SERVER_INSTANCE, context);
+
+        MutableComponent component = parseMessage(MessageMod.SERVER_INSTANCE, context);
+        MutableComponent result = MutableComponent.create(component.getContents()).withStyle(component.getStyle());
+        for (Component sibling : component.getSiblings()) {
+            result.append(ComponentUtils.updateForEntity(src, sibling, entity, i + 1));
+        }
+        return result;
     }
+
+    public String getKey() {
+        return key;
+    }
+
+    public Map<String, Component> getPlaceholders() {
+        return placeholders;
+    }
+
 
     public MutableComponent toText() {
         return MutableComponent.create(this);
+    }
+
+    @Override
+    public String toString() {
+        return "message{key='" + this.key + "'" + ", placeholders=" + this.placeholders + "}";
     }
 
 }

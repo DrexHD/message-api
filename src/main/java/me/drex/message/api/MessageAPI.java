@@ -2,12 +2,12 @@ package me.drex.message.api;
 
 import me.drex.message.impl.LanguageManager;
 
-public class MessageAPI {
+public interface MessageAPI {
 
     /**
      * Reloads all messages (from all mods)!
      */
-    public static void reload() {
+    static void reload() {
         LanguageManager.loadLanguages();
     }
 
