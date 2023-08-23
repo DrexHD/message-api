@@ -42,12 +42,12 @@ Add your message to the file (make sure to prefix the message id with your mod i
 
 ### Creating messages
 
-Use any of the provided methods in [Message](src/main/java/me/drex/message/api/Message.java) to get your text instance,
+Use any of the provided methods in [LocalizedMessage](src/main/java/me/drex/message/api/LocalizedMessage.java) to get your text instance,
 which works like any other vanilla text instance!
 
 ```java
 ServerPlayerEntity player;
-player.sendMessageToClient(Message.message("modid.some.message.id"));
+player.sendMessageToClient(LocalizedMessage.localized("modid.some.message.id"));
 ```
 
 <details>
@@ -55,7 +55,7 @@ player.sendMessageToClient(Message.message("modid.some.message.id"));
 
 ```java
 ServerPlayer player;
-player.sendSystemMessage(Message.message("modid.some.message.id"));
+player.sendSystemMessage(LocalizedMessage.localized("modid.some.message.id"));
 ```
 
 </details>
