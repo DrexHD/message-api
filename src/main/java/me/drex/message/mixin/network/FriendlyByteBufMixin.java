@@ -4,6 +4,7 @@ import eu.pb4.placeholders.api.PlaceholderContext;
 import me.drex.message.impl.MessageMod;
 import me.drex.message.impl.util.NbtLocalizer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,14 +20,14 @@ public abstract class FriendlyByteBufMixin {
         method = "writeItem",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/network/FriendlyByteBuf;writeNbt(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/network/FriendlyByteBuf;"
+            target = "Lnet/minecraft/network/FriendlyByteBuf;writeNbt(Lnet/minecraft/nbt/Tag;)Lnet/minecraft/network/FriendlyByteBuf;"
         )
     )
-    private CompoundTag localizeItemStack(CompoundTag compoundTag) {
-        if (compoundTag != null) {
+    private Tag localizeItemStack(Tag tag) {
+        if (tag != null) {
             ServerPlayer target = PACKET_LISTENER.get();
-            if (target == null) return compoundTag;
-            NbtLocalizer localizer = new NbtLocalizer(compoundTag, MessageMod.SERVER_INSTANCE, PlaceholderContext.of(target));
+            if (target == null) return tag;
+            NbtLocalizer localizer = new NbtLocalizer((CompoundTag) tag, MessageMod.SERVER_INSTANCE, PlaceholderContext.of(target));
             return localizer.getResult();
         }
         return null;

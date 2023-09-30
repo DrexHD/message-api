@@ -1,7 +1,7 @@
 package me.drex.message.mixin;
 
 import me.drex.message.impl.interfaces.ClientLanguageGetter;
-import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
+import net.minecraft.network.protocol.common.ServerboundClientInformationPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,7 +17,7 @@ public abstract class ServerGamePacketListenerImplMixin implements ClientLanguag
 
     @Inject(method = "handleClientInformation", at = @At(value = "TAIL"))
     public void saveClientLanguage(ServerboundClientInformationPacket clientInfoPacket, CallbackInfo ci) {
-        messageApi$language = clientInfoPacket.language();
+        messageApi$language = clientInfoPacket.information().language();
     }
 
     @Override
