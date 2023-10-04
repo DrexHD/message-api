@@ -40,7 +40,7 @@ public class TestMod implements ModInitializer {
                     stopWatch.start();
                     MessageAPI.reload();
                     stopWatch.stop();
-                    context.getSource().sendSuccess(LocalizedMessage.localized("testmod.reload", new HashMap<>() {{
+                    context.getSource().sendSuccess(() -> LocalizedMessage.localized("testmod.reload", new HashMap<>() {{
                         put("time", Component.literal(String.valueOf(stopWatch.getTime())));
                     }}), false);
                     return 1;
@@ -49,13 +49,13 @@ public class TestMod implements ModInitializer {
                     Commands.argument("target", EntityArgument.player())
                         .executes(context -> {
                             ServerPlayer target = EntityArgument.getPlayer(context, "target");
-                            context.getSource().sendSuccess(
+                            context.getSource().sendSuccess(() ->
                                 LocalizedMessage.localized("testmod.whois", PlaceholderContext.of(target)), false);
                             return 1;
                         })
                 ))
                 .then(Commands.literal("homes").executes(context -> {
-                    context.getSource().sendSuccess(
+                    context.getSource().sendSuccess(() ->
                         ComponentUtils.formatList(List.of(EXAMPLE_HOMES), LocalizedMessage.localized("testmod.homes.seperator"), home -> LocalizedMessage.localized("testmod.homes.element", home.placeholders())),
                         false
                     );
@@ -67,7 +67,7 @@ public class TestMod implements ModInitializer {
                             String name = StringArgumentType.getString(context, "name");
                             for (Home home : EXAMPLE_HOMES) {
                                 if (home.name.equals(name)) {
-                                    context.getSource().sendSuccess(LocalizedMessage.localized("testmod.home.teleport", home.placeholders()), false);
+                                    context.getSource().sendSuccess(() -> LocalizedMessage.localized("testmod.home.teleport", home.placeholders()), false);
                                     return 1;
                                 }
                             }
@@ -92,7 +92,7 @@ public class TestMod implements ModInitializer {
                 ).then(
                     Commands.literal("style")
                         .executes(context -> {
-                            context.getSource().sendSuccess(
+                            context.getSource().sendSuccess(() ->
                                 LocalizedMessage.localized("testmod.unstyled").withStyle(ChatFormatting.BLUE), false);
                             return 1;
                         })
