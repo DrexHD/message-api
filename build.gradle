@@ -41,12 +41,18 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modImplementation "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+    modLocalRuntime(modImplementation "eu.pb4:placeholder-api:${project.placeholder_api_version}")
 
     // testmod
     testModImplementation sourceSets.main.output
-    modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modTestModCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    Set<String> apiModules = [
+            "fabric-command-api-v2",
+    ]
+
+    apiModules.forEach {
+        modLocalRuntime(modTestModCompileOnly(fabricApi.module(it, project.fabric_version)))
+    }
 
 }
 

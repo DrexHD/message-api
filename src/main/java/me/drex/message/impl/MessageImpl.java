@@ -1,12 +1,17 @@
 package me.drex.message.impl;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.node.TextNode;
+import me.drex.message.api.LocalizedMessage;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static eu.pb4.placeholders.api.Placeholders.DEFAULT_PLACEHOLDER_GETTER;
+
 public class MessageImpl implements ComponentContents {
 
     private final String key;
@@ -24,6 +31,12 @@ public class MessageImpl implements ComponentContents {
     private final List<Placeholders.PlaceholderGetter> getters;
     @Nullable
     private final PlaceholderContext staticContext;
+
+    public static final MapCodec<MessageImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        Codec.STRING.fieldOf("key").forGetter(MessageImpl::getKey),
+        Codec.unboundedMap(Codec.STRING, ComponentSerialization.CODEC).optionalFieldOf("placeholders", Map.of()).forGetter(MessageImpl::getPlaceholders)
+    ).apply(instance, (key, placeholders) -> new MessageImpl(key, placeholders, List.of(DEFAULT_PLACEHOLDER_GETTER), null)));
+    public static final ComponentContents.Type<MessageImpl> TYPE = new ComponentContents.Type<>(CODEC, "message");
 
     public MessageImpl(String key, Map<String, Component> placeholders, List<Placeholders.PlaceholderGetter> getters, @Nullable PlaceholderContext staticContext) {
         this.key = key;
@@ -78,6 +91,11 @@ public class MessageImpl implements ComponentContents {
             result.append(ComponentUtils.updateForEntity(src, sibling, entity, i + 1));
         }
         return result;
+    }
+
+    @Override
+    public Type<?> type() {
+        return TYPE;
     }
 
     public String getKey() {

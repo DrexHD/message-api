@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +40,7 @@ public class NbtLocalizer {
         List<String> result = new ArrayList<>();
         MutableComponent builder = Component.empty();
         for (MutableComponent component : components) {
-            if (component.getContents() instanceof LiteralContents literal && literal.text().contains("\n")) {
+            if (component.getContents() instanceof PlainTextContents.LiteralContents literal && literal.text().contains("\n")) {
                 String[] lines = literal.text().split("\\n", -1);
                 for (int i = 0; i < lines.length - 1; i++) {
                     String line = lines[i];
