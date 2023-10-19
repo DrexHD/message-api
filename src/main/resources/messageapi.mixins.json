@@ -6,7 +6,6 @@
   "mixins": [
     "ComponentSerializationMixin",
     "ComponentSerializerAccessor",
-    "ComponentSerializerMixin",
     "MinecraftServerMixin",
     "ServerGamePacketListenerImplMixin",
     "network.FriendlyByteBufMixin",

@@ -1,7 +1,6 @@
 package me.drex.message.mixin.network;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
-import me.drex.message.impl.MessageMod;
 import me.drex.message.impl.util.NbtLocalizer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -27,7 +26,7 @@ public abstract class FriendlyByteBufMixin {
         if (tag != null) {
             ServerPlayer target = PACKET_LISTENER.get();
             if (target == null) return tag;
-            NbtLocalizer localizer = new NbtLocalizer((CompoundTag) tag, MessageMod.SERVER_INSTANCE, PlaceholderContext.of(target));
+            NbtLocalizer localizer = new NbtLocalizer((CompoundTag) tag, PlaceholderContext.of(target));
             return localizer.getResult();
         }
         return null;

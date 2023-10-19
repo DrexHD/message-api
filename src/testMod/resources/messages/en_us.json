@@ -7,6 +7,6 @@
   "testmod.home.unknown": "<red>Unknown home name!",
   "testmod.unstyled": "This message is unstyled, but gets styled in the code",
   "testmod.item.name": "<yellow>Hello %player:displayname%, you are at %player:pos_x% %player:pos_y% %player:pos_z%",
-  "testmod.item.lore": "<red>Move this item to update it's name and lore\n<rainbow>You can have multiple lines in lores</rainbow>\n<yellow>${variable}",
+  "testmod.item.lore": "<red>Move this item to update it's name and lore\n<rainbow>You can have multiple lines in lores</rainbow>\n<yellow>${variable}\n<reset>Bye %player:name% o/",
   "testmod.item.lore.inner": "This is a message <green>variable</green> used inside the lore"
 }

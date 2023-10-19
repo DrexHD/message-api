@@ -8,10 +8,8 @@ import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.node.TextNode;
-import me.drex.message.api.LocalizedMessage;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.*;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +80,9 @@ public class MessageImpl implements ComponentContents {
         if (src != null) {
             context = PlaceholderContext.of(src);
         } else {
-            if (entity != null) context = PlaceholderContext.of(entity);
+            if (entity != null) {
+                context = PlaceholderContext.of(entity);
+            }
         }
 
         MutableComponent component = parseMessage(MessageMod.SERVER_INSTANCE, context);

@@ -1,20 +1,20 @@
 package me.drex.message.impl.util;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import me.drex.message.impl.MessageImpl;
-import me.drex.message.impl.MessageMod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.PlainTextContents;
-import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -26,12 +26,10 @@ public class NbtLocalizer {
         .withColor(ChatFormatting.WHITE)
         .withItalic(false);
     private final CompoundTag compoundTag;
-    private final MinecraftServer server;
     private final PlaceholderContext placeholderContext;
     private boolean localized = false;
 
-    public NbtLocalizer(CompoundTag original, MinecraftServer server, PlaceholderContext placeholderContext) {
-        this.server = server;
+    public NbtLocalizer(CompoundTag original, PlaceholderContext placeholderContext) {
         this.placeholderContext = placeholderContext;
         this.compoundTag = original.copy();
     }
@@ -91,42 +89,40 @@ public class NbtLocalizer {
         return compoundTag;
     }
 
-    private String localizeMessageJson(String json) {
-        MutableComponent component;
+    private String localizeMessageJson(String original) {
         try {
-            component = Component.Serializer.fromJsonLenient(json);
-        } catch (Exception e) {
-            MessageMod.LOGGER.error("Failed to localize item name", e);
-            return json;
-        }
-        if (component.getContents() instanceof MessageImpl message) {
-            component = message.parseMessage(server, placeholderContext);
-            component.setStyle(component.getStyle().applyTo(DEFAULT_STYLE));
-            return Component.Serializer.toJson(component.withStyle());
-        } else {
-            return json;
+            JsonElement jsonElement = JsonParser.parseString(original);
+            DataResult<Component> parsedResult = ComponentSerialization.CODEC.parse(JsonOps.INSTANCE, jsonElement);
+            return parsedResult.result().map(component -> {
+                // Item names have default styles, we want them to be white non italic by default
+                if (component.getContents() instanceof MessageImpl) {
+                    ((MutableComponent) component).setStyle(component.getStyle().applyTo(DEFAULT_STYLE));
+                }
+
+                DataResult<JsonElement> encodedResult = ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, component);
+                return encodedResult.result().map(JsonElement::toString).orElse(original);
+            }).orElse(original);
+        } catch (JsonSyntaxException ignored) {
+            return original;
         }
     }
 
-    private List<String> localizeMessageLoreJson(String json) {
-        MutableComponent component;
+    private List<String> localizeMessageLoreJson(String original) {
         try {
-            component = Component.Serializer.fromJsonLenient(json);
-        } catch (Exception e) {
-            MessageMod.LOGGER.error("Failed to localize item lore", e);
-            return List.of(json);
-        }
-        if (component != null && component.getContents() instanceof MessageImpl) {
-            try {
-                component = ComponentUtils.updateForEntity(placeholderContext.source(), component, placeholderContext.entity(), 0);
-            } catch (CommandSyntaxException e) {
-                return List.of(json);
-            }
-            List<MutableComponent> components = new ArrayList<>();
-            collectComponents(components, component, DEFAULT_STYLE);
-            return splitComponents(components);
-        } else {
-            return List.of(json);
+            JsonElement jsonElement = JsonParser.parseString(original);
+            DataResult<Component> parsedResult = ComponentSerialization.CODEC.parse(JsonOps.INSTANCE, jsonElement);
+            return parsedResult.result().map(component -> {
+                try {
+                    component = ComponentUtils.updateForEntity(placeholderContext.source(), component, placeholderContext.entity(), 0);
+                } catch (CommandSyntaxException e) {
+                    return List.of(original);
+                }
+                List<MutableComponent> components = new ArrayList<>();
+                collectComponents(components, component, DEFAULT_STYLE);
+                return splitComponents(components);
+            }).orElse(List.of(original));
+        } catch (JsonSyntaxException ignored) {
+            return List.of(original);
         }
     }
 
