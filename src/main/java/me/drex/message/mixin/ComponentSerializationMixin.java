@@ -1,5 +1,6 @@
 package me.drex.message.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.serialization.Codec;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import me.drex.message.impl.MessageImpl;
@@ -38,25 +39,26 @@ public abstract class ComponentSerializationMixin {
         return result;
     }
 
-    @Inject(method = "createCodec", at = @At("RETURN"), cancellable = true)
-    private static void modifyCodec(Codec<Component> codec, CallbackInfoReturnable<Codec<Component>> cir) {
-        cir.setReturnValue(
-            cir.getReturnValue().xmap(Function.identity(),
-                component -> {
-                    ComponentContents contents = component.getContents();
-                    if (!(contents instanceof MessageImpl message)) {
-                        return component;
-                    }
-                    ServerPlayer target = PACKET_LISTENER.get();
-                    if (target == null) {
-                        return component;
-                    }
-                    MutableComponent parsedMessage = message.parseMessage(MessageMod.SERVER_INSTANCE, PlaceholderContext.of(target));
-                    for (Component sibling : component.getSiblings()) {
-                        parsedMessage.append(sibling);
-                    }
-                    parsedMessage.setStyle(parsedMessage.getStyle().applyTo(component.getStyle()));
-                    return parsedMessage;
-                }));
+    @ModifyReturnValue(method = "createCodec", at = @At("RETURN"))
+    private static Codec<Component> modifyCodec(Codec<Component> original) {
+        return original.xmap(Function.identity(),
+            component -> {
+                ComponentContents contents = component.getContents();
+                if (!(contents instanceof MessageImpl message)) {
+                    return component;
+                }
+                ServerPlayer target = PACKET_LISTENER.get();
+                if (target == null) {
+                    return component;
+                }
+                MutableComponent parsedMessage = message.parseMessage(MessageMod.SERVER_INSTANCE, PlaceholderContext.of(target));
+                for (Component sibling : component.getSiblings()) {
+                    parsedMessage.append(sibling);
+                }
+                parsedMessage.setStyle(parsedMessage.getStyle().applyTo(component.getStyle()));
+                return parsedMessage;
+            });
     }
+
+
 }
