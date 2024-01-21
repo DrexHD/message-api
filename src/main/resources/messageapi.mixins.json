@@ -5,12 +5,11 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ComponentSerializationMixin",
-    "ComponentSerializerAccessor",
     "MinecraftServerMixin",
     "ServerGamePacketListenerImplMixin",
-    "network.FriendlyByteBufMixin",
+    "network.ItemStackMixin",
     "network.PacketEncoderMixin",
-    "network.ServerConnectionListenerMixin"
+    "network.ConnectionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

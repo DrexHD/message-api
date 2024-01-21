@@ -24,7 +24,7 @@ public abstract class PacketEncoderMixin implements ConnectionHolder {
         method = "encode(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;Lio/netty/buffer/ByteBuf;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/network/protocol/Packet;write(Lnet/minecraft/network/FriendlyByteBuf;)V",
+            target = "Lnet/minecraft/network/codec/StreamCodec;encode(Ljava/lang/Object;Ljava/lang/Object;)V",
             shift = At.Shift.BEFORE
         )
     )
@@ -38,7 +38,7 @@ public abstract class PacketEncoderMixin implements ConnectionHolder {
         method = "encode(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;Lio/netty/buffer/ByteBuf;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/network/protocol/Packet;write(Lnet/minecraft/network/FriendlyByteBuf;)V",
+            target = "Lnet/minecraft/network/codec/StreamCodec;encode(Ljava/lang/Object;Ljava/lang/Object;)V",
             shift = At.Shift.AFTER
         )
     )
