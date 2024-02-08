@@ -15,10 +15,7 @@ import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static eu.pb4.placeholders.api.Placeholders.DEFAULT_PLACEHOLDER_GETTER;
 
@@ -48,12 +45,27 @@ public class MessageImpl implements ComponentContents {
         context = Objects.requireNonNullElseGet(this.staticContext, () -> Objects.requireNonNullElseGet(dynamicContext, () -> PlaceholderContext.of(server)));
         TextNode node = LanguageManager.resolveMessageId(context.player(), this.key);
         if (this.placeholders != null) {
-            node = Placeholders.parseNodes(node, Placeholders.PREDEFINED_PLACEHOLDER_PATTERN, this.placeholders);
+            Map<String, Component> parsedPlaceholders = new HashMap<>();
+            this.placeholders.forEach((key1, value) -> parsedPlaceholders.put(key1, parseComponent(value, dynamicContext)));
+            node = Placeholders.parseNodes(node, Placeholders.PREDEFINED_PLACEHOLDER_PATTERN, parsedPlaceholders);
         }
         for (Placeholders.PlaceholderGetter getter : getters) {
             node = Placeholders.parseNodes(node, Placeholders.PLACEHOLDER_PATTERN, getter);
         }
         return (MutableComponent) node.toText(ParserContext.of(PlaceholderContext.KEY, context), true);
+    }
+
+    public static Component parseComponent(Component component, PlaceholderContext context) {
+        ComponentContents contents = component.getContents();
+        if (!(contents instanceof MessageImpl message)) {
+            return component;
+        }
+        MutableComponent parsedMessage = message.parseMessage(MessageMod.SERVER_INSTANCE, context);
+        for (Component sibling : component.getSiblings()) {
+            parsedMessage.append(parseComponent(sibling, context));
+        }
+        parsedMessage.setStyle(parsedMessage.getStyle().applyTo(component.getStyle()));
+        return parsedMessage;
     }
 
     @Override

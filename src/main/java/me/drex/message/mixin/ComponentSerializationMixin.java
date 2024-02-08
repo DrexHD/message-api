@@ -12,10 +12,9 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Function;
 
@@ -43,22 +42,13 @@ public abstract class ComponentSerializationMixin {
     private static Codec<Component> modifyCodec(Codec<Component> original) {
         return original.xmap(Function.identity(),
             component -> {
-                ComponentContents contents = component.getContents();
-                if (!(contents instanceof MessageImpl message)) {
-                    return component;
-                }
+                PlaceholderContext context = null;
                 ServerPlayer target = PACKET_LISTENER.get();
-                if (target == null) {
-                    return component;
+                if (target != null) {
+                    context = PlaceholderContext.of(target);
                 }
-                MutableComponent parsedMessage = message.parseMessage(MessageMod.SERVER_INSTANCE, PlaceholderContext.of(target));
-                for (Component sibling : component.getSiblings()) {
-                    parsedMessage.append(sibling);
-                }
-                parsedMessage.setStyle(parsedMessage.getStyle().applyTo(component.getStyle()));
-                return parsedMessage;
+                return MessageImpl.parseComponent(component, context);
             });
     }
-
 
 }
