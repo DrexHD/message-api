@@ -7,9 +7,9 @@
     "ComponentSerializationMixin",
     "MinecraftServerMixin",
     "ServerGamePacketListenerImplMixin",
-    "network.ItemStackMixin",
-    "network.PacketEncoderMixin",
-    "network.ConnectionMixin"
+    "network.ConnectionMixin",
+    "network.ItemLoreMixin",
+    "network.PacketEncoderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

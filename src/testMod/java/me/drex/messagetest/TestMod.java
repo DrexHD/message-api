@@ -10,13 +10,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.HashMap;
@@ -80,12 +80,8 @@ public class TestMod implements ModInitializer {
                             ServerPlayer player = context.getSource().getPlayerOrException();
                             ItemStack handItem = player.getMainHandItem();
                             if (!handItem.isEmpty()) {
-                                handItem.setHoverName(LocalizedMessage.localized("testmod.item.name"));
-                                ListTag lore = new ListTag();
-                                lore.add(StringTag.valueOf(Component.Serializer.toJson(
-                                    LocalizedMessage.localized("testmod.item.lore", Map.of("player", player.getDisplayName(), "variable", LocalizedMessage.localized("testmod.item.lore.inner")))
-                                )));
-                                handItem.getOrCreateTagElement("display").put("Lore", lore);
+                                handItem.set(DataComponents.CUSTOM_NAME, LocalizedMessage.localized("testmod.item.name"));
+                                handItem.set(DataComponents.LORE, new ItemLore(List.of(LocalizedMessage.localized("testmod.item.lore", Map.of("player", player.getDisplayName(), "variable", LocalizedMessage.localized("testmod.item.lore.inner"))))));
                             }
                             return 1;
                         })

@@ -4,15 +4,11 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.serialization.Codec;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import me.drex.message.impl.MessageImpl;
-import me.drex.message.impl.MessageMod;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
@@ -42,10 +38,12 @@ public abstract class ComponentSerializationMixin {
     private static Codec<Component> modifyCodec(Codec<Component> original) {
         return original.xmap(Function.identity(),
             component -> {
-                PlaceholderContext context = null;
+                PlaceholderContext context;
                 ServerPlayer target = PACKET_LISTENER.get();
                 if (target != null) {
                     context = PlaceholderContext.of(target);
+                } else {
+                    return component;
                 }
                 return MessageImpl.parseComponent(component, context);
             });
