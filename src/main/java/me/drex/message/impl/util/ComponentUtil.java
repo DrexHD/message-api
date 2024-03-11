@@ -46,9 +46,7 @@ public class ComponentUtil {
                 }
             }
         } else {
-            if (!currentLine.getValue().getSiblings().isEmpty()) {
-                currentLine.getValue().append(MutableComponent.create(contents).setStyle(mergedStyle));
-            }
+            currentLine.getValue().append(MutableComponent.create(contents).setStyle(mergedStyle));
         }
         for (Component sibling : siblings) {
             parseNewLines0(currentLine, mergedStyle, sibling, result);
