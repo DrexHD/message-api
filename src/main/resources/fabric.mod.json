@@ -18,8 +18,8 @@
     "messageapi.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.10",
-    "java": ">=17"
+    "fabricloader": ">=0.15.10",
+    "java": ">=21"
   },
   "custom": {
     "modmenu": {
