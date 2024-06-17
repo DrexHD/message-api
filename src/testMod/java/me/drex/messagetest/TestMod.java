@@ -26,9 +26,9 @@ import java.util.Map;
 public class TestMod implements ModInitializer {
 
     public static final Home[] EXAMPLE_HOMES = new Home[]{
-        new Home("Base", new BlockPos(46, 73, -125), new ResourceLocation("minecraft:overworld")),
-        new Home("End", new BlockPos(-64, 100, 0), new ResourceLocation("minecraft:the_end")),
-        new Home("Spawn", new BlockPos(0, 65, 0), new ResourceLocation("minecraft:overworld")),
+        new Home("Base", new BlockPos(46, 73, -125), ResourceLocation.parse("minecraft:overworld")),
+        new Home("End", new BlockPos(-64, 100, 0), ResourceLocation.parse("minecraft:the_end")),
+        new Home("Spawn", new BlockPos(0, 65, 0), ResourceLocation.parse("minecraft:overworld")),
     };
 
     @Override
@@ -40,9 +40,7 @@ public class TestMod implements ModInitializer {
                     stopWatch.start();
                     MessageAPI.reload();
                     stopWatch.stop();
-                    context.getSource().sendSuccess(() -> LocalizedMessage.localized("testmod.reload", new HashMap<>() {{
-                        put("time", Component.literal(String.valueOf(stopWatch.getTime())));
-                    }}), false);
+                    context.getSource().sendSuccess(() -> LocalizedMessage.builder("testmod.reload").addPlaceholder("time", stopWatch.getTime()).build(), false);
                     return 1;
                 }))
                 .then(Commands.literal("whois").then(
@@ -50,13 +48,13 @@ public class TestMod implements ModInitializer {
                         .executes(context -> {
                             ServerPlayer target = EntityArgument.getPlayer(context, "target");
                             context.getSource().sendSuccess(() ->
-                                LocalizedMessage.localized("testmod.whois", PlaceholderContext.of(target)), false);
+                                LocalizedMessage.builder("testmod.whois").setStaticContext(PlaceholderContext.of(target)).build(), false);
                             return 1;
                         })
                 ))
                 .then(Commands.literal("homes").executes(context -> {
                     context.getSource().sendSuccess(() ->
-                        ComponentUtils.formatList(List.of(EXAMPLE_HOMES), LocalizedMessage.localized("testmod.homes.seperator"), home -> LocalizedMessage.localized("testmod.homes.element", home.placeholders())),
+                            ComponentUtils.formatList(List.of(EXAMPLE_HOMES), LocalizedMessage.localized("testmod.homes.seperator"), home -> LocalizedMessage.localized("testmod.homes.element", home.placeholders())),
                         false
                     );
                     return 1;
@@ -81,7 +79,12 @@ public class TestMod implements ModInitializer {
                             ItemStack handItem = player.getMainHandItem();
                             if (!handItem.isEmpty()) {
                                 handItem.set(DataComponents.CUSTOM_NAME, LocalizedMessage.localized("testmod.item.name"));
-                                handItem.set(DataComponents.LORE, new ItemLore(List.of(LocalizedMessage.localized("testmod.item.lore", Map.of("player", player.getDisplayName(), "variable", LocalizedMessage.localized("testmod.item.lore.inner"))))));
+                                handItem.set(DataComponents.LORE, new ItemLore(List.of(
+                                    LocalizedMessage.builder("testmod.item.lore")
+                                        .addPlaceholder("player", player.getDisplayName())
+                                        .addPlaceholder("variable", LocalizedMessage.localized("testmod.item.lore.inner"))
+                                        .build()
+                                )));
                             }
                             return 1;
                         })
