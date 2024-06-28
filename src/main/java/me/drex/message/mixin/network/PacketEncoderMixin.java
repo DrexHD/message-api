@@ -29,7 +29,7 @@ public abstract class PacketEncoderMixin implements ConnectionHolder {
         )
     )
     private void setPacketListener(ChannelHandlerContext channelHandlerContext, Packet<?> packet, ByteBuf byteBuf, CallbackInfo ci) {
-        if (message_api$connection.getPacketListener() instanceof ServerGamePacketListenerImpl listener) {
+        if (message_api$connection != null && message_api$connection.getPacketListener() instanceof ServerGamePacketListenerImpl listener) {
             MessageMod.PACKET_LISTENER.set(listener.getPlayer());
         }
     }
