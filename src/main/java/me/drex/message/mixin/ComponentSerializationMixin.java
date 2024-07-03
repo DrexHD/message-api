@@ -16,7 +16,11 @@ import java.util.function.Function;
 
 import static me.drex.message.impl.MessageMod.PACKET_LISTENER;
 
-@Mixin(ComponentSerialization.class)
+/*
+ * Priority is set to 500 to apply our @ModifyReturnValue before adventure's unconditional return cancel:
+ * https://github.com/KyoriPowered/adventure-platform-fabric/blob/mc/1.21/src/mixin/java/net/kyori/adventure/platform/fabric/impl/mixin/minecraft/network/chat/ComponentSerializationMixin.java#L43
+ * */
+@Mixin(value = ComponentSerialization.class, priority = 500)
 public abstract class ComponentSerializationMixin {
 
     @ModifyArg(
