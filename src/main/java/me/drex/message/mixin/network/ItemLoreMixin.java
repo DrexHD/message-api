@@ -1,19 +1,14 @@
 package me.drex.message.mixin.network;
 
-import com.mojang.serialization.Codec;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import me.drex.message.impl.MessageImpl;
 import me.drex.message.impl.util.ComponentUtil;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.component.ItemLore;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,8 +34,12 @@ public abstract class ItemLoreMixin {
                 context = PlaceholderContext.of(target);
                 List<Component> result = new LinkedList<>();
                 for (Component line : itemLore.lines()) {
-                    // We need to parse lore manually, to apply our new line feature to the parsed components
-                    ComponentUtil.parseNewLines(MessageImpl.parseComponent(line, context), result);
+                    if (line.getContents() instanceof MessageImpl) {
+                        // We need to parse lore manually, to apply our new line feature to the parsed components
+                        ComponentUtil.parseNewLines(MessageImpl.parseComponent(line, context), result);
+                    } else {
+                        result.add(line);
+                    }
                 }
                 return result;
             }
