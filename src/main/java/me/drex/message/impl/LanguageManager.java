@@ -3,11 +3,15 @@ package me.drex.message.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import eu.pb4.placeholders.api.TextParserUtils;
+import eu.pb4.placeholders.api.ParserContext;
+import eu.pb4.placeholders.api.node.DynamicTextNode;
 import eu.pb4.placeholders.api.node.TextNode;
+import eu.pb4.placeholders.api.parsers.NodeParser;
+import eu.pb4.placeholders.api.parsers.TagLikeParser;
 import me.drex.message.impl.interfaces.ClientLanguageGetter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +22,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,6 +34,14 @@ public class LanguageManager {
     // TODO: configurable default language
     public static final String DEFAULT_LANG = "en_us";
     public static final String MESSAGES = "messages";
+    public static final ParserContext.Key<Function<String, Component>> PLACEHOLDERS = DynamicTextNode.key("message_api/placeholders");
+    public static final NodeParser PARSER = NodeParser.builder()
+        .simplifiedTextFormat()
+        .quickText()
+        .globalPlaceholders()
+        .placeholders(TagLikeParser.PLACEHOLDER_USER, PLACEHOLDERS)
+        .staticPreParsing()
+        .build();
     private static final Path CONFIG_MESSAGES_PATH = FabricLoader.getInstance().getConfigDir().resolve(MESSAGES);
     private static final String FILE_SUFFIX = ".json";
 
@@ -61,7 +74,7 @@ public class LanguageManager {
                         entry -> entry.getValue().entrySet().stream().collect(
                             Collectors.toMap(
                                 Map.Entry::getKey,
-                                innerEntry -> TextParserUtils.formatNodes(innerEntry.getValue())
+                                innerEntry -> PARSER.parseNode(innerEntry.getValue())
                             ))
                     ))
             );
@@ -83,7 +96,7 @@ public class LanguageManager {
         }
         // Attempt to load the message using the default language "en_us"
         Map<String, TextNode> messages = cachedLanguageData.getOrDefault(DEFAULT_LANG, Collections.emptyMap());
-        return messages.getOrDefault(key, TextParserUtils.formatNodes(key));
+        return messages.getOrDefault(key, PARSER.parseNode(key));
     }
 
     private static Map<String, Map<String, String>> loadModLanguages(ModContainer modContainer) {

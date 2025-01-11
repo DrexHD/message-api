@@ -4,9 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.node.TextNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.*;
@@ -17,26 +15,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static eu.pb4.placeholders.api.Placeholders.DEFAULT_PLACEHOLDER_GETTER;
-
 public class MessageImpl implements ComponentContents {
 
     private final String key;
     private final Map<String, Component> placeholders;
-    private final List<Placeholders.PlaceholderGetter> getters;
     @Nullable
     private final PlaceholderContext staticContext;
 
     public static final MapCodec<MessageImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         Codec.STRING.fieldOf("key").forGetter(MessageImpl::getKey),
         Codec.unboundedMap(Codec.STRING, ComponentSerialization.CODEC).optionalFieldOf("placeholders", Map.of()).forGetter(MessageImpl::getPlaceholders)
-    ).apply(instance, (key, placeholders) -> new MessageImpl(key, placeholders, List.of(DEFAULT_PLACEHOLDER_GETTER), null)));
+    ).apply(instance, (key, placeholders) -> new MessageImpl(key, placeholders, null)));
     public static final ComponentContents.Type<MessageImpl> TYPE = new ComponentContents.Type<>(CODEC, "message");
 
-    public MessageImpl(String key, Map<String, Component> placeholders, List<Placeholders.PlaceholderGetter> getters, @Nullable PlaceholderContext staticContext) {
+    public MessageImpl(String key, Map<String, Component> placeholders, @Nullable PlaceholderContext staticContext) {
         this.key = key;
         this.placeholders = placeholders;
-        this.getters = getters;
         this.staticContext = staticContext;
     }
 
@@ -44,15 +38,11 @@ public class MessageImpl implements ComponentContents {
         PlaceholderContext context;
         context = Objects.requireNonNullElseGet(this.staticContext, () -> Objects.requireNonNullElseGet(dynamicContext, () -> PlaceholderContext.of(server)));
         TextNode node = LanguageManager.resolveMessageId(context.player(), this.key);
+        Map<String, Component> parsedPlaceholders = new HashMap<>();
         if (this.placeholders != null) {
-            Map<String, Component> parsedPlaceholders = new HashMap<>();
             this.placeholders.forEach((key1, value) -> parsedPlaceholders.put(key1, parseComponent(value, dynamicContext)));
-            node = Placeholders.parseNodes(node, Placeholders.PREDEFINED_PLACEHOLDER_PATTERN, parsedPlaceholders);
         }
-        for (Placeholders.PlaceholderGetter getter : getters) {
-            node = Placeholders.parseNodes(node, Placeholders.PLACEHOLDER_PATTERN, getter);
-        }
-        return (MutableComponent) node.toText(ParserContext.of(PlaceholderContext.KEY, context), true);
+        return (MutableComponent) node.toText(context.asParserContext().with(LanguageManager.PLACEHOLDERS, parsedPlaceholders::get), true);
     }
 
     public static Component parseComponent(Component component, PlaceholderContext context) {

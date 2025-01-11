@@ -1,7 +1,6 @@
 package me.drex.message.api;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.Nullable;
@@ -19,8 +18,6 @@ public interface LocalizedMessageBuilder {
     LocalizedMessageBuilder addPlaceholder(String key, Component component);
 
     LocalizedMessageBuilder addPlaceholders(Map<String, Component> placeholders);
-
-    LocalizedMessageBuilder addPlaceholderGetter(Placeholders.PlaceholderGetter placeholderGetter);
 
     LocalizedMessageBuilder setStaticContext(@Nullable PlaceholderContext staticContext);
 
