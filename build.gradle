@@ -62,11 +62,12 @@ processResources {
 publishMods {
     file = remapJar.archiveFile
     additionalFiles.from(remapSourcesJar.archiveFile)
-
     type = STABLE
-
     displayName = "message-api ${version.get()}"
     changelog = ""
+
+    modLoaders.add("fabric")
+    modLoaders.add("quilt")
 
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")

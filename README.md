@@ -1,5 +1,3 @@
-[![release](https://jitpack.io/v/DrexHD/message-api.svg)](https://jitpack.io/#DrexHD/message-api)
-
 # message-api
 
 A simple server-side message API for Fabric. It allows for translatable messages, with text parsing
