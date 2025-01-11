@@ -1,10 +1,10 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
-    id "me.modmuss50.mod-publish-plugin" version "0.6.2"
+    id 'fabric-loom' version '1.9-SNAPSHOT'
+    id "me.modmuss50.mod-publish-plugin" version "0.8.3"
     id 'maven-publish'
 }
 
-version = project.mod_version + "-" + project.minecraft_version
+version = project.mod_version + "+" + project.minecraft_version
 group = project.maven_group
 
 repositories {
@@ -61,16 +61,29 @@ processResources {
 
 publishMods {
     file = remapJar.archiveFile
+    additionalFiles.from(remapSourcesJar.archiveFile)
+
     type = STABLE
 
     displayName = "message-api ${version.get()}"
     changelog = ""
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = "BJEC0JAD"
+        minecraftVersions.add(project.minecraft_version)
+    }
 
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
         repository = providers.environmentVariable("GITHUB_REPOSITORY").getOrElse("DrexHD/dryrun")
         commitish = providers.environmentVariable("GITHUB_REF_NAME").getOrElse("dryrun")
     }
+    dryRun = true
+}
+
+java {
+    withSourcesJar()
 }
 
 jar {

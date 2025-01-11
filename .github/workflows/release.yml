@@ -16,4 +16,5 @@ jobs:
       - name: Publish mods
         run: ./gradlew build publishMods
         env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
