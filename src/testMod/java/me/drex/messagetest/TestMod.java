@@ -48,7 +48,7 @@ public class TestMod implements ModInitializer {
                         .executes(context -> {
                             ServerPlayer target = EntityArgument.getPlayer(context, "target");
                             context.getSource().sendSuccess(() ->
-                                LocalizedMessage.builder("testmod.whois").setStaticContext(PlaceholderContext.of(target)).build(), false);
+                                LocalizedMessage.builder("testmod.whois").setStaticContext(PlaceholderContext.of(target)).build(), true);
                             return 1;
                         })
                 ))
