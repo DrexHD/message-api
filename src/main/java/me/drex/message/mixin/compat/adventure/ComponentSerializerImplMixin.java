@@ -11,7 +11,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import me.drex.message.compat.adventure.EmptyRenderer;
 import net.kyori.adventure.text.BuildableComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -148,7 +147,7 @@ public abstract class ComponentSerializerImplMixin {
         @Share("placeholders") LocalRef<Map<String, BuildableComponent<?, ?>>> placeholdersRef
     ) {
         if (keyRef.get() != null) {
-            return Component.virtual(Void.class, new EmptyRenderer()).toBuilder();
+            return Component.empty().toBuilder();
         } else {
             return original.call(instance, s);
         }
