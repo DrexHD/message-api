@@ -41,7 +41,7 @@ public abstract class ItemLoreMixin {
                         result.add(line);
                     }
                 }
-                return result;
+                return result.subList(0, Math.min(result.size(), ItemLore.MAX_LINES));
             }
             return itemLore.lines();
         };

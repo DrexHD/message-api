@@ -11,6 +11,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TextComponentTagVisitor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -74,6 +76,28 @@ public class TestMod implements ModInitializer {
                         }))
                 ).then(
                     Commands.literal("item")
+                        .then(
+                            Commands.literal("manylines")
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    ItemStack handItem = player.getMainHandItem();
+                                    if (!handItem.isEmpty()) {
+                                        CompoundTag tag = new CompoundTag();
+                                        for (int i = 0; i < 1000; i++) {
+                                            tag.putInt("tag" + i, i);
+                                        }
+                                        var lore = new TextComponentTagVisitor("    ").visit(tag);
+
+                                        handItem.set(DataComponents.LORE, new ItemLore(List.of(
+                                            LocalizedMessage.builder("testmod.item.lore")
+                                                .addPlaceholder("player", player.getDisplayName())
+                                                .addPlaceholder("variable", lore)
+                                                .build()
+                                        )));
+                                    }
+                                    return 1;
+                                })
+                        )
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayerOrException();
                             ItemStack handItem = player.getMainHandItem();
