@@ -26,7 +26,9 @@ public class MessageImpl implements ComponentContents {
         Codec.STRING.fieldOf("key").forGetter(MessageImpl::getKey),
         Codec.unboundedMap(Codec.STRING, ComponentSerialization.CODEC).optionalFieldOf("placeholders", Map.of()).forGetter(MessageImpl::getPlaceholders)
     ).apply(instance, (key, placeholders) -> new MessageImpl(key, placeholders, null)));
-    public static final ComponentContents.Type<MessageImpl> TYPE = new ComponentContents.Type<>(CODEC, "message");
+    //? if <= 1.21.8 {
+    /*public static final ComponentContents.Type<MessageImpl> TYPE = new ComponentContents.Type<>(CODEC, "message");
+    *///?}
 
     public MessageImpl(String key, Map<String, Component> placeholders, @Nullable PlaceholderContext staticContext) {
         this.key = key;
@@ -95,10 +97,17 @@ public class MessageImpl implements ComponentContents {
         return result;
     }
 
+    //? if >= 1.21.9 {
     @Override
+    public MapCodec<? extends ComponentContents> codec() {
+        return CODEC;
+    }
+    //?} else {
+    /*@Override
     public Type<?> type() {
         return TYPE;
     }
+    *///?}
 
     public String getKey() {
         return key;
