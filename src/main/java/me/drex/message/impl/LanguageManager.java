@@ -129,13 +129,13 @@ public class LanguageManager {
             try (
                 Stream<Path> files = Files.walk(root, 1)
             ) {
-                Set<Path> paths = files.filter(p -> !Files.isDirectory(p)).collect(Collectors.toSet());
+                Set<Path> paths = files.filter(p -> !Files.isDirectory(p) && p.getFileName().toString().endsWith(FILE_SUFFIX)).collect(Collectors.toSet());
                 for (Path path : paths) {
                     try {
                         String languageCode = parseLanguageCode(path.getFileName().toString());
                         messages.put(languageCode, loadLanguageData(path));
                     } catch (IllegalArgumentException e) {
-                        LOGGER.error("Failed to parse language file name", e);
+                        LOGGER.error("Failed to parse language file name '{}'", path.getFileName());
                     }
                 }
                 return messages;
@@ -155,9 +155,6 @@ public class LanguageManager {
     }
 
     private static String parseLanguageCode(String fileName) {
-        if (!fileName.endsWith(FILE_SUFFIX)) {
-            throw new IllegalArgumentException("Language files have to end with \"" + FILE_SUFFIX + "\", but found \"" + fileName + "\"");
-        }
         String languageCode = fileName.substring(0, fileName.length() - FILE_SUFFIX.length());
         if (languageCode.length() > 16) {
             throw new IllegalArgumentException("Language code must not be longer than 16 characters: \"" + languageCode + "\"");
@@ -170,9 +167,8 @@ public class LanguageManager {
             String data = Files.readString(path);
             return GSON.fromJson(data, LANGUAGEDATA_TYPE);
         } catch (IOException e) {
-            LOGGER.error("Failed to read data from \"" + path + "\"", e);
+            LOGGER.error("Failed to read data from '" + path + "'");
             return Collections.emptyMap();
         }
-
     }
 }
