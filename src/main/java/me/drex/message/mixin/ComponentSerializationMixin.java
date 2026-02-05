@@ -29,15 +29,15 @@ import static me.drex.message.impl.MessageMod.PACKET_LISTENER;
 public abstract class ComponentSerializationMixin {
 
     //? if >= 1.21.9 {
-    @Inject(
+    /*@Inject(
         method = "bootstrap",
         at = @At("TAIL")
     )
     private static void addMessageType(ExtraCodecs.LateBoundIdMapper<String, MapCodec<? extends ComponentContents>> lateBoundIdMapper, CallbackInfo ci) {
         lateBoundIdMapper.put("message", MessageImpl.CODEC);
     }
-    //?} else {
-    /*@ModifyArg(
+    *///?} else {
+    @ModifyArg(
         method = "createCodec",
         at = @At(
             value = "INVOKE",
@@ -51,7 +51,7 @@ public abstract class ComponentSerializationMixin {
         result[original.length] = MessageImpl.TYPE;
         return result;
     }
-    *///?}
+    //?}
 
     @ModifyReturnValue(method = "createCodec", at = @At("RETURN"))
     private static Codec<Component> modifyCodec(Codec<Component> original) {

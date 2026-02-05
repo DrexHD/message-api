@@ -8,7 +8,6 @@ import eu.pb4.placeholders.api.node.DynamicTextNode;
 import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import eu.pb4.placeholders.api.parsers.TagLikeParser;
-import me.drex.message.impl.interfaces.ClientLanguageGetter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.chat.Component;
@@ -51,6 +50,7 @@ public class LanguageManager {
 
     private static final Map<String, Map<String, String>> languageData = new HashMap<>();
     private static final Map<String, Map<String, TextNode>> cachedLanguageData = new HashMap<>();
+    private static final Map<UUID, String> playerLanguages = new HashMap<>();
 
     private LanguageManager() {
     }
@@ -87,7 +87,7 @@ public class LanguageManager {
         String languageCode;
         if (player != null) {
             // Attempt to load the message using the players chosen language
-            languageCode = ((ClientLanguageGetter) player.connection).getLanguage();
+            languageCode = playerLanguages.get(player.getUUID());
             @Nullable Map<String, TextNode> messages = cachedLanguageData.get(languageCode);
             if (messages != null) {
                 TextNode message = messages.get(key);
@@ -144,6 +144,10 @@ public class LanguageManager {
             LOGGER.error("Failed to load language files", e);
             return Collections.emptyMap();
         }
+    }
+
+    public static void updatePlayerLanguage(UUID player, String languageCode) {
+        playerLanguages.put(player, languageCode);
     }
 
     private static void mergeLanguageData(Map<String, Map<String, String>> original, Map<String, Map<String, String>> otherMap) {

@@ -1,6 +1,6 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
-    id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+    id 'fabric-loom' version '1.15-SNAPSHOT'
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
     id 'maven-publish'
 }
 
@@ -66,6 +66,12 @@ processResources {
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version
+    }
+}
+
+stonecutter {
+    replacements.string(eval(current.version, "<=1.21.10")) {
+        replace("Identifier", "ResourceLocation")
     }
 }
 
