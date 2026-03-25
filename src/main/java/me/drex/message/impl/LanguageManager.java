@@ -12,6 +12,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +38,11 @@ public class LanguageManager {
     public static final NodeParser PARSER = NodeParser.builder()
         .simplifiedTextFormat()
         .quickText()
-        .globalPlaceholders()
+        //? if >= 26.1 {
+        .serverPlaceholders()
+        //? } else {
+//        .globalPlaceholders()
+        //?}
         .placeholders(TagLikeParser.PLACEHOLDER_USER, PLACEHOLDERS)
         .staticPreParsing()
         .build();
@@ -83,7 +88,7 @@ public class LanguageManager {
         }
     }
 
-    public static TextNode resolveMessageId(@Nullable ServerPlayer player, @NotNull String key) {
+    public static TextNode resolveMessageId(@Nullable Player player, @NotNull String key) {
         String languageCode;
         if (player != null) {
             // Attempt to load the message using the players chosen language

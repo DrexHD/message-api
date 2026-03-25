@@ -2,6 +2,7 @@ package me.drex.messagetest;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import me.drex.message.api.LocalizedMessage;
 import me.drex.message.api.MessageAPI;
 import net.fabricmc.api.ModInitializer;
@@ -15,7 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TextComponentTagVisitor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
@@ -28,9 +29,9 @@ import java.util.Map;
 public class TestMod implements ModInitializer {
 
     public static final Home[] EXAMPLE_HOMES = new Home[]{
-        new Home("Base", new BlockPos(46, 73, -125), ResourceLocation.parse("minecraft:overworld")),
-        new Home("End", new BlockPos(-64, 100, 0), ResourceLocation.parse("minecraft:the_end")),
-        new Home("Spawn", new BlockPos(0, 65, 0), ResourceLocation.parse("minecraft:overworld")),
+        new Home("Base", new BlockPos(46, 73, -125), Identifier.parse("minecraft:overworld")),
+        new Home("End", new BlockPos(-64, 100, 0), Identifier.parse("minecraft:the_end")),
+        new Home("Spawn", new BlockPos(0, 65, 0), Identifier.parse("minecraft:overworld")),
     };
 
     @Override
@@ -50,7 +51,7 @@ public class TestMod implements ModInitializer {
                         .executes(context -> {
                             ServerPlayer target = EntityArgument.getPlayer(context, "target");
                             context.getSource().sendSuccess(() ->
-                                LocalizedMessage.builder("testmod.whois").setStaticContext(PlaceholderContext.of(target)).build(), true);
+                                LocalizedMessage.builder("testmod.whois").setStaticContext(/*? if >= 26.1 {*/ServerPlaceholderContext.of(target)/*? } else {*/ /*PlaceholderContext.of(target)*/ /*? }*/).build(), true);
                             return 1;
                         })
                 ))
@@ -124,7 +125,7 @@ public class TestMod implements ModInitializer {
         });
     }
 
-    record Home(String name, BlockPos pos, ResourceLocation dim) {
+    record Home(String name, BlockPos pos, Identifier dim) {
         Map<String, Component> placeholders() {
             return new HashMap<>() {{
                 put("home_name", Component.literal(name));

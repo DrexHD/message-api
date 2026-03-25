@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom-remap' version '1.15-SNAPSHOT'
     id "me.modmuss50.mod-publish-plugin" version "1.1.0"
     id 'maven-publish'
 }
@@ -23,6 +23,8 @@ sourceSets {
 }
 
 loom {
+    createRemapConfigurations(sourceSets.testMod)
+
     runs {
         testModClient {
             client()
@@ -45,9 +47,10 @@ loom {
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    compileOnly "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+    modCompileOnly "eu.pb4:placeholder-api:${project.placeholder_api_version}"
 
     compileOnly "net.kyori:adventure-text-serializer-gson:${project.adventure_version}"
 
@@ -73,8 +76,8 @@ stonecutter {
 }
 
 publishMods {
-    file = jar.archiveFile
-//    additionalFiles.from(tasks.named("sourcesJar"))
+    file = remapJar.archiveFile
+    additionalFiles.from(remapSourcesJar.archiveFile)
     type = STABLE
     displayName = "message-api ${version.get()}"
     changelog = ""

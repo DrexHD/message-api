@@ -5,6 +5,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.placeholders.api.PlaceholderContext;
+//? if >= 26.1 {
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
+//? }
 import eu.pb4.placeholders.api.node.TextNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.*;
@@ -27,8 +30,8 @@ public class MessageImpl implements ComponentContents {
         Codec.unboundedMap(Codec.STRING, ComponentSerialization.CODEC).optionalFieldOf("placeholders", Map.of()).forGetter(MessageImpl::getPlaceholders)
     ).apply(instance, (key, placeholders) -> new MessageImpl(key, placeholders, null)));
     //? if <= 1.21.8 {
-    public static final ComponentContents.Type<MessageImpl> TYPE = new ComponentContents.Type<>(CODEC, "message");
-    //?}
+    /*public static final ComponentContents.Type<MessageImpl> TYPE = new ComponentContents.Type<>(CODEC, "message");
+     *///?}
 
     public MessageImpl(String key, Map<String, Component> placeholders, @Nullable PlaceholderContext staticContext) {
         this.key = key;
@@ -38,13 +41,19 @@ public class MessageImpl implements ComponentContents {
 
     public MutableComponent parseMessage(MinecraftServer server, @Nullable PlaceholderContext dynamicContext) {
         PlaceholderContext context;
-        context = Objects.requireNonNullElseGet(this.staticContext, () -> Objects.requireNonNullElseGet(dynamicContext, () -> PlaceholderContext.of(server)));
+        context = Objects.requireNonNullElseGet(this.staticContext, () -> Objects.requireNonNullElseGet(dynamicContext, () -> {
+            //? if >= 26.1 {
+            return ServerPlaceholderContext.of(server);
+            //? } else {
+//            return PlaceholderContext.of(server);
+            //? }
+        }));
         TextNode node = LanguageManager.resolveMessageId(context.player(), this.key);
         Map<String, Component> parsedPlaceholders = new HashMap<>();
         if (this.placeholders != null) {
             this.placeholders.forEach((key1, value) -> parsedPlaceholders.put(key1, parseComponent(value, dynamicContext)));
         }
-        return (MutableComponent) node.toText(context.asParserContext().with(LanguageManager.PLACEHOLDERS, parsedPlaceholders::get), true);
+        return (MutableComponent) node./*? if > 1.21.11 {*/toComponent/*?} else {*//*toText*//*?}*/(context.asParserContext().with(LanguageManager.PLACEHOLDERS, parsedPlaceholders::get), true);
     }
 
     public static Component parseComponent(Component component, PlaceholderContext context) {
@@ -63,7 +72,7 @@ public class MessageImpl implements ComponentContents {
     @Override
     public <T> @NotNull Optional<T> visit(FormattedText.StyledContentConsumer<T> styledContentConsumer, Style style) {
         try {
-            return resolve(null, null, 0).visit(styledContentConsumer, style);
+            return resolve(null/*? if < 26.1 {*//*, null*//*? }*/, 0).visit(styledContentConsumer, style);
         } catch (Throwable e) {
             return Optional.empty();
         }
@@ -72,13 +81,14 @@ public class MessageImpl implements ComponentContents {
     @Override
     public <T> @NotNull Optional<T> visit(FormattedText.ContentConsumer<T> contentConsumer) {
         try {
-            return resolve(null, null, 0).visit(contentConsumer);
+            return resolve(null/*? if < 26.1 {*//*, null*//*? }*/, 0).visit(contentConsumer);
         } catch (Throwable e) {
             return Optional.empty();
         }
     }
 
-    @Override
+    //? if < 26.1 {
+    /*@Override
     public @NotNull MutableComponent resolve(@Nullable CommandSourceStack src, @Nullable Entity entity, int i) throws CommandSyntaxException {
         PlaceholderContext context = null;
         if (src != null) {
@@ -95,19 +105,20 @@ public class MessageImpl implements ComponentContents {
             result.append(ComponentUtils.updateForEntity(src, sibling, entity, i + 1));
         }
         return result;
-    }
+    }*/
+    //? }
 
     //? if >= 1.21.9 {
-    /*@Override
+    @Override
     public MapCodec<? extends ComponentContents> codec() {
         return CODEC;
     }
-    *///?} else {
-    @Override
+    //?} else {
+    /*@Override
     public Type<?> type() {
         return TYPE;
     }
-    //?}
+    *///?}
 
     public String getKey() {
         return key;

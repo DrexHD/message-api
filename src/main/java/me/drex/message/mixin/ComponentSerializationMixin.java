@@ -4,6 +4,9 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.placeholders.api.PlaceholderContext;
+//? if >= 26.1 {
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
+//? }
 import me.drex.message.impl.MessageImpl;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
@@ -29,15 +32,15 @@ import static me.drex.message.impl.MessageMod.PACKET_LISTENER;
 public abstract class ComponentSerializationMixin {
 
     //? if >= 1.21.9 {
-    /*@Inject(
+    @Inject(
         method = "bootstrap",
         at = @At("TAIL")
     )
     private static void addMessageType(ExtraCodecs.LateBoundIdMapper<String, MapCodec<? extends ComponentContents>> lateBoundIdMapper, CallbackInfo ci) {
         lateBoundIdMapper.put("message", MessageImpl.CODEC);
     }
-    *///?} else {
-    @ModifyArg(
+    //?} else {
+    /*@ModifyArg(
         method = "createCodec",
         at = @At(
             value = "INVOKE",
@@ -51,7 +54,7 @@ public abstract class ComponentSerializationMixin {
         result[original.length] = MessageImpl.TYPE;
         return result;
     }
-    //?}
+    *///?}
 
     @ModifyReturnValue(method = "createCodec", at = @At("RETURN"))
     private static Codec<Component> modifyCodec(Codec<Component> original) {
@@ -60,7 +63,11 @@ public abstract class ComponentSerializationMixin {
                 PlaceholderContext context;
                 ServerPlayer target = PACKET_LISTENER.get();
                 if (target != null) {
-                    context = PlaceholderContext.of(target);
+                    //? if >= 26.1 {
+                    context = ServerPlaceholderContext.of(target);
+                    //? } else {
+//                    context = PlaceholderContext.of(target);
+                    //? }
                 } else {
                     return component;
                 }

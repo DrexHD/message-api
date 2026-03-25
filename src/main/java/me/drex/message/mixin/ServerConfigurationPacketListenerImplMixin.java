@@ -20,6 +20,6 @@ public abstract class ServerConfigurationPacketListenerImplMixin {
 
     @Inject(method = "handleClientInformation", at = @At(value = "TAIL"))
     public void saveClientLanguage(ServerboundClientInformationPacket clientInfoPacket, CallbackInfo ci) {
-        LanguageManager.updatePlayerLanguage(gameProfile./*?if <= 1.21.8 {*/getId() /*? } else {*/ /*id()*/ /*?}*/, clientInfoPacket.information().language());
+        LanguageManager.updatePlayerLanguage(gameProfile./*?if <= 1.21.8 {*//*getId() *//*? } else {*/ id() /*?}*/, clientInfoPacket.information().language());
     }
 }

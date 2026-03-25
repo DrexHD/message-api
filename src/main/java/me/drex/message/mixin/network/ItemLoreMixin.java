@@ -1,6 +1,9 @@
 package me.drex.message.mixin.network;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
+//? if >= 26.1 {
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
+//? }
 import me.drex.message.impl.MessageImpl;
 import me.drex.message.impl.util.ComponentUtil;
 import net.minecraft.network.chat.Component;
@@ -31,7 +34,11 @@ public abstract class ItemLoreMixin {
             PlaceholderContext context;
             ServerPlayer target = PACKET_LISTENER.get();
             if (target != null) {
-                context = PlaceholderContext.of(target);
+                //? if >= 26.1 {
+                context = ServerPlaceholderContext.of(target);
+                //? } else {
+//                    context = PlaceholderContext.of(target);
+                //? }
                 List<Component> result = new LinkedList<>();
                 for (Component line : itemLore.lines()) {
                     if (line.getContents() instanceof MessageImpl) {
